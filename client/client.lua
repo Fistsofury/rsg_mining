@@ -5,15 +5,16 @@ local miningactive = false
 -- create prompts for mining
 Citizen.CreateThread(function()
     for mines, v in pairs(Config.MiningLocations) do
-        exports['qbr-core']:createPrompt(v.name, v.coords, Config.MiningKey, 'Start Mining', {
+        exports['qbr-core']:createPrompt(v.location, v.coords, Config.MiningKey, 'Start Mining', {
             type = 'client',
             event = 'rsg_mining:clent:startmining',
             args = {},
         })
         if v.showblip == true then
-            local StoreBlip = N_0x554d9d53f696d002(1664425300, v.coords)
-            SetBlipSprite(StoreBlip, 2255188926, 1)
-            SetBlipScale(StoreBlip, 0.2)
+            local MineBlip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, v.coords)
+            SetBlipSprite(MineBlip, 2255188926, 1)
+            SetBlipScale(MineBlip, 0.2)
+			Citizen.InvokeNative(0x9CB1A1623062F402, MineBlip, v.name)
         end
     end
 end)
@@ -59,15 +60,15 @@ AddEventHandler('rsg_mining:clent:startmining', function()
 				if randomNumber > 95 then
 					TriggerServerEvent('QBCore:Server:RemoveItem', "pickaxe", 1)
 					TriggerEvent("inventory:client:ItemBox", sharedItems["pickaxe"], "remove")
-					exports['rsg_notify']:DisplayNotification('your pickaxe is broken', 5000)
+					exports['qbr-core']:Notify(9, 'your pickaxe is broken', 5000, 0, 'mp_lobby_textures', 'cross', 'COLOR_WHITE')
 				else
 					TriggerServerEvent('rsg_mining:server:giveMineReward')
 				end
 			else
-				exports['rsg_notify']:DisplayNotification('you don\'t have a pickaxe!', 5000)
+				exports['qbr-core']:Notify(9, 'you don\'t have a pickaxe!', 5000, 0, 'mp_lobby_textures', 'cross', 'COLOR_WHITE')
 			end
 		else
-			exports['rsg_notify']:DisplayNotification('you are already mining!', 5000)
+			exports['qbr-core']:Notify(9, 'you are already mining!', 5000, 0, 'mp_lobby_textures', 'cross', 'COLOR_WHITE')
 		end
 	end, { ['pickaxe'] = 1 })
 end)
